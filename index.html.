@@ -1,0 +1,200 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scolarity Eleven</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f1f5fa;
+  color: #26364a;
+}
+header {
+  background: white;
+  padding: 20px;
+  text-align: center;
+  font-size: 23px;
+  font-weight: bold;
+  color: #294b76;
+}
+header span { color: #d3a83f; }
+main { padding: 15px; max-width: 650px; margin: auto; }
+.card {
+  background: white;
+  padding: 17px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+  border: 1px solid #dce5ef;
+}
+h2 { font-size: 17px; }
+.stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  text-align: center;
+}
+.stat {
+  background: #f1f5fa;
+  padding: 12px 5px;
+  border-radius: 9px;
+  flex: 1;
+  font-size: 12px;
+}
+.stat b { display: block; font-size: 19px; }
+nav {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 7px;
+  margin-bottom: 15px;
+}
+button {
+  padding: 13px 8px;
+  border: 1px solid #d5dfeb;
+  background: white;
+  border-radius: 9px;
+  font-weight: bold;
+  color: #294b76;
+  cursor: pointer;
+}
+button.active, button.primary {
+  background: #294b76;
+  color: white;
+}
+#content button { width: 100%; margin-top: 8px; }
+.money { color: #23845b; font-size: 25px; font-weight: bold; }
+</style>
+</head>
+<body>
+<header>SCOLARITY <span>ELEVEN</span></header>
+<main>
+<div class="card">
+  <h2>👤 Mon personnage</h2>
+  <h3 id="name">Alex Martin</h3>
+  <p id="age">16 ans · Lycéen</p>
+  <div class="stats">
+    <div class="stat"><b id="school">65</b>École</div>
+    <div class="stat"><b id="happiness">75</b>Bonheur</div>
+    <div class="stat"><b id="year">2026</b>Année</div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>💰 Mon argent</h2>
+  <div class="money" id="money">250 €</div>
+  <p>Épargne : <b id="savings">100 €</b></p>
+</div>
+
+<nav>
+  <button class="active" onclick="show('home',this)">🏠 Accueil</button>
+  <button onclick="show('studies',this)">🎓 Études</button>
+  <button onclick="show('jobs',this)">💼 Métiers</button>
+  <button onclick="show('bank',this)">💰 Banque</button>
+  <button onclick="show('life',this)">🌆 Vie</button>
+</nav>
+
+<div class="card" id="content"></div>
+</main>
+
+<script>
+let age=16, year=2026, money=250, savings=100;
+let school=65, happiness=75, income=0;
+let study="Seconde générale";
+let job="Aucun métier";
+
+function update(){
+ document.getElementById("age").textContent=age+" ans · "+study;
+ document.getElementById("school").textContent=school;
+ document.getElementById("happiness").textContent=happiness;
+ document.getElementById("year").textContent=year;
+ document.getElementById("money").textContent=money+" €";
+ document.getElementById("savings").textContent=savings+" €";
+}
+
+function show(page,btn){
+ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+ if(btn) btn.classList.add("active");
+ let c=document.getElementById("content");
+
+ if(page==="home"){
+ c.innerHTML=`
+ <h2>🏠 Bienvenue dans ta vie !</h2>
+ <p>Tu as ${age} ans. Construis ton avenir avec tes choix.</p>
+ <p>Études : ${study}</p>
+ <p>Métier : ${job}</p>
+ <button class="primary" onclick="nextYear()">Passer à l'année suivante ➜</button>`;
+ }
+
+ if(page==="studies"){
+ c.innerHTML="<h2>🎓 Choisis tes études</h2>";
+ ["Seconde générale","Seconde technologique","Lycée professionnel","Apprentissage"].forEach(x=>{
+ c.innerHTML+=`<button onclick="chooseStudy('${x}')">${x}</button>`;
+ });
+ }
+
+ if(page==="jobs"){
+ c.innerHTML="<h2>💼 Choisis une activité</h2>";
+ [["Baby-sitting",80],["Aide aux devoirs",100],["Petits services",60],["Aucun métier",0]].forEach(x=>{
+ c.innerHTML+=`<button onclick="chooseJob('${x[0]}',${x[1]})">${x[0]} — ${x[1]} €/mois</button>`;
+ });
+ }
+
+ if(page==="bank"){
+ c.innerHTML=`
+ <h2>💰 Ma banque</h2>
+ <p>Argent disponible : ${money} €</p>
+ <p>Épargne : ${savings} €</p>
+ <button onclick="saveMoney(50)">Épargner 50 €</button>
+ <button onclick="saveMoney(-50)">Retirer 50 €</button>`;
+ }
+
+ if(page==="life"){
+ c.innerHTML=`
+ <h2>🌆 Ma vie</h2>
+ <button onclick="activity()">Faire du sport (-15 €)</button>
+ <p>Bonheur : ${happiness}/100</p>`;
+ }
+ update();
+}
+
+function chooseStudy(x){
+ study=x;
+ school=Math.min(100,school+3);
+ show("studies");
+}
+
+function chooseJob(x,salary){
+ job=x;
+ income=salary;
+ show("jobs");
+}
+
+function saveMoney(n){
+ if(n>0 && money>=n){money-=n;savings+=n;}
+ else if(n<0 && savings>=-n){money-=n;savings+=n;}
+ update();show("bank");
+}
+
+function activity(){
+ if(money>=15){
+ money-=15;
+ happiness=Math.min(100,happiness+5);
+ }
+ update();show("life");
+}
+
+function nextYear(){
+ if(!confirm("Passer à l'année suivante ?")) return;
+ age++;
+ year++;
+ money+=income*12;
+ school=Math.min(100,school+2);
+ update();show("home");
+}
+
+show("home");
+</script>
+</body>
+</html>
